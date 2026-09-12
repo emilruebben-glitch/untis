@@ -1,0 +1,43 @@
+name: Untis Check
+
+on:
+  schedule:
+    # Laeuft alle 5 Minuten zwischen 6 und 17 Uhr an Werktagen, das ist
+    # das schnellste was GitHub Actions erlaubt. Jede Minute geht leider
+    # nicht, GitHub fuehrt Zeitplaene die haeufiger als alle 5 Minuten
+    # feuern wuerden einfach nicht aus.
+    - cron: "*/5 6-17 * * 1-5"
+      timezone: "Europe/Berlin"
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@v4
+
+      - name: Python einrichten
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Abhaengigkeiten installieren
+        run: pip install -r requirements.txt
+
+      - name: Stundenplan pruefen
+        env:
+          UNTIS_SCHOOL: ${{ secrets.UNTIS_SCHOOL }}
+          UNTIS_SERVER: ${{ secrets.UNTIS_SERVER }}
+          UNTIS_USERNAME: ${{ secrets.UNTIS_USERNAME }}
+          UNTIS_PASSWORD: ${{ secrets.UNTIS_PASSWORD }}
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+        run: python untis_check.py
+
+      - name: Stand speichern
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Stundenplan Stand aktualisiert"
+          file_pattern: state.json

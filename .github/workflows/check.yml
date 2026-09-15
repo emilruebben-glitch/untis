@@ -2,12 +2,11 @@ name: Untis Check
 
 on:
   schedule:
-    # Laeuft alle 5 Minuten zwischen 6 und 17 Uhr an Werktagen, das ist
-    # das schnellste was GitHub Actions erlaubt. Jede Minute geht leider
-    # nicht, GitHub fuehrt Zeitplaene die haeufiger als alle 5 Minuten
-    # feuern wuerden einfach nicht aus.
-    - cron: "*/5 6-17 * * 1-5"
-      timezone: "Europe/Berlin"
+    # Laeuft durchgehend rund um die Uhr alle 5 Minuten, das ist das
+    # schnellste was GitHub Actions erlaubt. Das geht hier nur weil
+    # das Repository oeffentlich ist, dort gibt es unbegrenzte
+    # Freiminuten fuer Actions.
+    - cron: "*/5 * * * *"
   workflow_dispatch:
 
 jobs:
